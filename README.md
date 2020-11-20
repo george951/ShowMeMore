@@ -23,3 +23,4 @@ By creating the model, and compiling it. By compiling it, it defines the loss fu
 7. Run  `pip install glob`
 8. Run  `pip install scikit-image`
 
+To run the program press `python3 main.py`
