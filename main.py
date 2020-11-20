@@ -63,4 +63,4 @@ for i in range(10):
 
 #Printing 10 images sorted from the closest image to least closest with the predicted label and the percentage of it
 for i in range(10):
-    print(label_names[indexList[i]],':', round(prediction[0][indexList[i]] * 100, 2))
+    print(label_names[indexList[i]],':', round(prediction[0][indexList[i]] * 100, 2), '%')
