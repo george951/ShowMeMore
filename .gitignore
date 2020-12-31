@@ -1,4 +1,3 @@
 #Ignore files
-.idea
-test.py
+.git
 package-lock.json
