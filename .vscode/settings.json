@@ -1,4 +1,4 @@
 {
     "git.ignoreLimitWarning": true,
-    "python.linting.enabled": true
+    "python.linting.enabled": false
 }

@@ -2,13 +2,13 @@
 
 ## Description
 
-A simple image recognition written in python, which works by training on some build-in image dataset and test some preselected images.
+A simple image recognition written in python, which works with a pre-trained model called yolov3 a real time object detector and a 
 
 ## How it works
 
-I've chosen an image dataset from **Keras** which contains over  60.000 images in 10 classes with 6000 images per class. Also, there are 50.000 training images and 10.000 test images.
+This model applies on the image at multiple locations and scales, the high scoring region of it are considered detections
 
-By creating the model, and compiling it. By compiling it, it defines the loss function, the optimizer/learning rate and the metrics. When the model is called it predicts the labels of the imported images and then it prints the labels with the prediction accuracy.
+This model makes predictions with a single network evaluation and is very similar to **Fast R-CNN** algorithm
 
 ## How to run 
 
@@ -17,10 +17,7 @@ By creating the model, and compiling it. By compiling it, it defines the loss fu
 1. Run `git clone https://github.com/george951/ShowMeMore.git`
 2. Download [Python3](https://www.python.org/downloads/)
 3. Download [Pip](https://pip.pypa.io/en/stable/installing/)
-4. Download [Tensorflow](https://www.tensorflow.org/install)
-5. Run  `python3 -m pip install -U matplotlib` 
-6. Run  `pip install numpy`
-7. Run  `pip install glob`
-8. Run  `pip install scikit-image`
+4. Run  `pip install numpy`
+5. Run  `pip install scikit-image` or `pip install opencv-python`
 
 To run the program press `python3 main.py`
