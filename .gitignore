@@ -1,3 +1,4 @@
 #Ignore files
 .git
 package-lock.json
+.gitattributes
