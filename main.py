@@ -1,19 +1,21 @@
 import cv2
 import numpy as np
+from matplotlib import pyplot as plt
 
-net = cv2.dnn.readNet('assets/yolov3.weights','assets/yolov3.cfg')
+
+net = cv2.dnn.readNet('assets/yolov3.weights', 'assets/yolov3.cfg')
 classes = []
 
 # Passing the names of the txt file in a array
-with open('assets/coco_names.txt','r') as f:
+with open('assets/coco_names.txt', 'r') as f:
     classes = f.read().splitlines()
 
-# Storing the image and take the with, the height and the depth 
-img = cv2.imread('assets/image.jpeg')
+# Storing the image and take the with, the height and the depth
+img = plt.imread('assets/image.jpeg')
 height, width, deapth = img.shape
 
 # Make sure all the imported image will have the same size and also scalling down the image
-blob = cv2.dnn.blobFromImage(img, 1/255, (416,416), (0,0,0), swapRB=True, crop=False)
+blob = cv2.dnn.blobFromImage(img, 1/255, (416, 416), (0, 0, 0), swapRB=True, crop=False)
 net.setInput(blob)
 output_layers = net.getUnconnectedOutLayersNames()
 layerOutputs = net.forward(output_layers)
@@ -49,16 +51,38 @@ boxes = cv2.dnn.NMSBoxes(pounding_boxes, predictions, 0.5, 0.4)
 font = cv2.FONT_HERSHEY_PLAIN
 colors = np.random.uniform(0, 255, size=(len(pounding_boxes), 3))
 
-#Showing in the new image the pounding boxes with label name and a prediction 
+# Showing in the new image the pounding boxes with label name and a prediction
+
+distinct_labels = []
+quantity_labels = []
+all_labels = []
+
+
+bar_fig, bar_axes = plt.subplots()
+fig, axes = plt.subplots()
+
 for i in boxes.flatten():
     x, y, w, h = pounding_boxes[i]
     label = str(classes[class_ids[i]])
-    prediction = str(round(predictions[i], 2))
+    prediction = str(round(predictions[i], 2) * 100)
     color = colors[i]
-    cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
-    cv2.putText(img, label + " " + prediction, (x, y + 20), font, 2, (255,255,255), 2)
 
+    rect = plt.Rectangle((x, y), w, h, linewidth = 1, edgecolor = 'b', facecolor = 'none')
+    label_text = plt.text((x + 2), (y + 20), label)
+    prediction_text = plt.text((x + 2), (y + 37), prediction + "%")
+    plt.xticks([])
+    plt.yticks([])
+    axes.add_patch(rect)
 
-cv2.imshow("Image", img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    distinct_labels.append(label)
+    all_labels.append(label)
+    distinct_labels = list(set(distinct_labels))
+
+    quantity_labels = []
+    for value in distinct_labels:
+        quantity_labels.append(len([temp_label for temp_label in all_labels if value == temp_label]))
+
+# Making a bar chart that shows the quantity of every object in the image
+bar_chart = bar_axes.bar(distinct_labels, quantity_labels,width = 0.4 ,color='blue')
+axes.imshow(img)
+plt.show()
