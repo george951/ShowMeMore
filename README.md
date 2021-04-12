@@ -10,7 +10,7 @@ This model applies on the image at multiple locations and scales, the high scori
 
 This model makes predictions with a single network evaluation and is very similar to **Fast R-CNN** algorithm
 
-## How to run 
+## How to run on Linux 
 
 **Steps**
 
@@ -19,5 +19,17 @@ This model makes predictions with a single network evaluation and is very simila
 3. Download [Pip](https://pip.pypa.io/en/stable/installing/)
 4. Run  `pip install numpy`
 5. Run  `pip install scikit-image` or `pip install opencv-python`
+6. Run  `pip install matplotlib`
 
 To run the program press `python3 main.py`
+
+**------------------------------------------------------------------------------------------------------------------------------------**
+## How to run on Windows
+
+**Steps**
+
+1. Download [Python3](https://www.python.org/downloads/windows/)
+2. Download the code from github **|Code| -> |Download Zip|**
+3. Run `pip install numpy`
+4. Run `pip install scikit-image` or `pip install opencv-python`
+5. Run `pip install matplotlib`
