@@ -33,3 +33,5 @@ To run the program press `python3 main.py`
 3. Run `pip install numpy`
 4. Run `pip install scikit-image` or `pip install opencv-python`
 5. Run `pip install matplotlib`
+
+To run the program press `python3 main.py`
