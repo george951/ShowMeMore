@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}
+    ShowMeMore
+{% endblock  %} 
+
+{% block content%}
+<form  method="POST">
+    <h3 align="center">Login</h3>
+    <div class="form-group">
+      <!--Email entry-->
+      <div class="mb-3">
+        <label for="Email" class="form-label">Email Address</label>
+        <input
+          type="email"
+          class="form-control"
+          id="Email"
+          name="email"
+          placeholder="ex. yourname@gmail.com"
+        />
+       </div>
+      <!--Password entry-->
+      <div class="mb-3">
+        <label for="Password" class="form-label">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="Password"
+          name="password"
+        />
+      </div>
+      <button type="submit" class="btn btn-primary">Login</button>
+    </div>
+  </form>
+{% endblock%}
