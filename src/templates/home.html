@@ -5,7 +5,63 @@ ShowMeMore
 {% endblock  %} 
 
 {% block content%}
-<div class="entry-page">
-    <h1>Hi</h1>
-</div>
+<style>
+   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap');
+   @media screen and (max-width: 320px) {
+       body {
+           font-size:1.8em;
+       }
+   }
+   
+   body {
+       background-image:linear-gradient(to left, #9370DB, #7B68EE)
+   }
+
+   h1 {
+        font-family:"Payfair Display", serif;
+        text-align: center;
+        margin-top:10px;
+   }
+   
+   p{
+       font-family: "Payfair Display",serif;
+       text-align: left;
+    }
+
+    .button-image {
+        position: absolute;
+        right:830px;
+        margin-top:200px;
+    }
+
+</style>
+
+<h1><b>About The App</b></h1>
+<hr>
+<table style="width:100%">
+    <tr>
+        <th>
+            <p><b>Would you like to know how an AI can recognize the objects from an image?<br>
+                The only thing that you'll need to do is to select your image from your gallery</b></p>
+        </th>
+        <th class="right-side">
+            <p><b>Now how it works? The algorithm takes that layer and tries to find<br>an object from that,
+            and if it did then it create a new layer, an so go on</b></p>
+        </th>
+    </tr>
+    <tr>
+        <th>
+            <img style="border-radius: 20%;" src="{{url_for('static', filename='image.jpeg')}}">
+        </th>
+        <th>
+            <img style="border-radius: 20%;" src="{{url_for('static', filename='expected_image.png')}}">
+        </th>
+    </tr>
+    <tr>
+        <th class="button-image">
+            <button style="border-radius:30%;padding:30px;" class="btn btn-dark btn-lg">Choose you image</button>
+        </th>
+    </tr>
+</table>
+
 {% endblock%}
