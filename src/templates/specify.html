@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}
+ShowMeMore
+{% endblock %}
+
+{% block content %}
+    <img src= "{{url_for('static', filename='predicted_image.jpeg')}}" alt="predicted image">
+{% endblock %}
