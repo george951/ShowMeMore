@@ -1,10 +1,18 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, Flask, render_template, request, flash, request,redirect, url_for
 from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from flask_login import login_user, login_required, logout_user, current_user
+from src import create_app
+
 
 auth = Blueprint("auth", __name__)
+app = create_app()
+
+UPLOAD_FOLDER = "../assets/*jpeg"
+ALLOWED_EXTENSIONS = set(['jpeg','png','jpg'])
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
 @auth.route("/login", methods=['GET', 'POST'])
