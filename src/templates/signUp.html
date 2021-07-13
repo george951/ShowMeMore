@@ -1,6 +1,17 @@
 {% extends "base.html" %} {% block title %} Sign Up {% endblock %} 
 
 {% block content%}
+<style>
+  @media screen and (max-width: 320px) {
+    body {
+        font-size:1.8em;
+    }
+  }
+
+  body {
+    background-image:linear-gradient(to left, #9370DB, #7B68EE)
+  }
+</style>
 <form method="POST">
   <h3 align="center">Sign Up</h3>
   <div class="form-group">
