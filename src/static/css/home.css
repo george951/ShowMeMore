@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap');
+   @media screen and (max-width: 320px) {
+       body {
+           font-size:1.8em;
+       }
+   }
+   
+   body {
+       background-image:linear-gradient(to left, #9370DB, #7B68EE)
+   }
+
+   h1 {
+        font-family:"Payfair Display", serif;
+        text-align: center;
+        margin-top:10px;
+   }
+   
+   p{
+       font-family: "Payfair Display",serif;
+       text-align: left;
+    }
+
+    .button-image {
+        position: absolute;
+        right:830px;
+        margin-top:200px;
+    }

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}
+ShowMeMore
+{% endblock  %} 
+
+{% block content%}
+<link rel="stylesheet" href="/static/css/home.css">
+<h1><b>About The App</b></h1>
+<hr>
+<table style="width:100%">
+    <tr>
+        <th>
+            <p><b>Would you like to know how an AI can recognize the objects from an image?<br>
+                The only thing that you'll need to do is to select your image from your gallery</b></p>
+        </th>
+        <th class="right-side">
+            <p><b>Now how it works? The algorithm takes that layer and tries to find<br>an object from that,
+            and if it did then it create a new layer, an so go on</b></p>
+        </th>
+    </tr>
+    <tr>
+        <th>
+            <img style="border-radius: 20%;" src="{{url_for('static', filename='pre-uploaded_images/image.jpeg')}}">
+        </th>
+        <th>
+            <img style="border-radius: 20%;" src="{{url_for('static', filename='pre-uploaded_images/expected_image.png')}}">
+        </th>
+    </tr>
+</table>
+
+{% endblock%}
