@@ -5,37 +5,7 @@ ShowMeMore
 {% endblock  %} 
 
 {% block content%}
-<style>
-   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap');
-   @media screen and (max-width: 320px) {
-       body {
-           font-size:1.8em;
-       }
-   }
-   
-   body {
-       background-image:linear-gradient(to left, #9370DB, #7B68EE)
-   }
-
-   h1 {
-        font-family:"Payfair Display", serif;
-        text-align: center;
-        margin-top:10px;
-   }
-   
-   p{
-       font-family: "Payfair Display",serif;
-       text-align: left;
-    }
-
-    .button-image {
-        position: absolute;
-        right:830px;
-        margin-top:200px;
-    }
-
-</style>
-
+<link rel="stylesheet" href="/static/css/home.css">
 <h1><b>About The App</b></h1>
 <hr>
 <table style="width:100%">
@@ -51,15 +21,10 @@ ShowMeMore
     </tr>
     <tr>
         <th>
-            <img style="border-radius: 20%;" src="{{url_for('static', filename='image.jpeg')}}">
+            <img style="border-radius: 20%;" src="{{url_for('static', filename='pre-uploaded_images/image.jpeg')}}">
         </th>
         <th>
-            <img style="border-radius: 20%;" src="{{url_for('static', filename='expected_image.png')}}">
-        </th>
-    </tr>
-    <tr>
-        <th class="button-image">
-            <button style="border-radius:30%;padding:30px;" class="btn btn-dark btn-lg">Choose you image</button>
+            <img style="border-radius: 20%;" src="{{url_for('static', filename='pre-uploaded_images/expected_image.png')}}">
         </th>
     </tr>
 </table>
