@@ -2,7 +2,10 @@ from flask import Blueprint, render_template, Flask, flash, request, redirect, u
 from flask_login import login_required, current_user
 import os
 from werkzeug.utils import secure_filename
+from sqlalchemy.exc import IntegrityError, OperationalError
 from src import create_app
+from .models import Image, User
+from . import db
 
 import cv2
 import numpy as np
@@ -10,6 +13,9 @@ from matplotlib import pyplot as plt
 
 views = Blueprint("views", __name__)
 app = create_app()
+
+filename = ""
+ext = ""
 
 
 @views.route("/sign-up")
@@ -22,9 +28,8 @@ def signUp():
 def home():
     return render_template("home.html", user=current_user)
 
-
 app.config["IMAGE_UPLOADS"] = "src/static/image_upload"
-app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["PNG", "JPG", "JPEG", ]
+app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["JPG", "JPEG", ]
 folder_images = os.listdir("src/static/image_upload")
 
 
@@ -41,6 +46,8 @@ def allowed_image(filename):
 @views.route("/image_upload", methods=["GET", "POST"])
 def image_upload():
     if request.method == "POST":
+        title = request.form.get("Title")
+        description = request.form.get("Description")
 
         if request.files:
             image = request.files["image"]
@@ -55,7 +62,21 @@ def image_upload():
                 return redirect(request.url)
             else:
                 filename = secure_filename(image.filename)
-                filename = "image.jpeg"
+                if title == "":
+                    title = filename
+                if description == "":
+                    description = ""
+                try:
+                    new_file = Image(data = f'src/static/image_upload/{filename}',title = title, description = description, user_id = current_user.id)
+                    user = User.query.filter_by(id = current_user.id).first()
+                    for images in user.images:
+                        if new_file.data == images.data:
+                            print("This image already exists")
+                            return redirect (request.url)
+                    db.session.add(new_file)
+                except OperationalError or IntegrityError:
+                    db.session.rollback()
+            db.session.commit()
             image.save(os.path.join(app.config["IMAGE_UPLOADS"], filename))
             return redirect(url_for("views.specify"))
     return render_template("image_upload.html", user=current_user)
@@ -70,7 +91,14 @@ def specify():
         classes = f.read().splitlines()
 
     # Storing the image and take the with, the height and the depth
-    img = plt.imread("src/static/image_upload/image.jpeg")
+    user = User.query.get(current_user.id)
+    ext = user.images[-1].data.split(".")
+    if user.images[-1].title:
+        filename = user.images[-1].title
+        fullname = filename+"."+ext[-1]
+    else:
+        filename = user.images[-1].data.split("/")
+    img = plt.imread(user.images[-1].data)
     height, width, deapth = img.shape
 
     # Make sure all the imported image will have the same size and also scalling down the image
@@ -143,6 +171,15 @@ def specify():
                 len([temp_label for temp_label in all_labels if value == temp_label]))
 
         axes.imshow(img)
-        plt.savefig("src/static/predicted_image.jpeg", bbox_inches="tight")
+        if user.images[-1].title:
+            prediction_image = f"src/static/predicted_images/{fullname}"
+            plt.savefig(prediction_image, bbox_inches="tight")
+            return render_template("specify.html", user=current_user,name = prediction_image[4:], title = filename, description = user.images[-1].description)
+        else:
+            prediction_image = f"src/static/predicted_images/{filename[-1]}"
+            plt.savefig(prediction_image, bbox_inches="tight")
+            return render_template("specify.html", user=current_user, name = prediction_image[4:] )
 
-    return render_template("specify.html", user=current_user)
+@views.route("/specify/<int:id>")
+def specify_images(id):
+    return render_template("specify_images.html")
