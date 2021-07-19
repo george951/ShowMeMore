@@ -84,6 +84,11 @@
     <script>
       type = "text/javascript";
       src = "{{ url_for('static', filename='index.js') }}";
+        $(".custom-file-input").on("change", function() {
+          var fileName = $(this).val().split("\\").pop();
+          $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
     </script>
+    
   </body>
 </html>
