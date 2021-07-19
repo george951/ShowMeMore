@@ -1,9 +1,11 @@
-{% extends "base.html" %}
-
-{% block title %}
-ShowMeMore
-{% endblock %}
-
-{% block content %}
-    <img src= "{{url_for('static', filename='predicted_image.jpeg')}}" alt="predicted image">
+{% extends "base.html" %} {% block title %} ShowMeMore {% endblock %} {% block
+content %}
+<div class="card" style="width: 18rem">
+  <img src="{{ name }}" class="card-img-top" alt="predicted image" />
+    <div class="card-body">
+        <h5 class="card-title">{{ title }}</h5>
+        <p class="card-text">{{ description }}</p>
+        <a href="{{ url_for ('views.specify_images', id=current_user.id) }}" class="btn btn-primary">Go somewhere</a>
+    </div>
+</div>
 {% endblock %}
