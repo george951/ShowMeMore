@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, Flask, flash, request, redirect, url_for, redirect
 from flask_login import login_required, current_user
 import os
+from numpy.core.records import array
 from werkzeug.utils import secure_filename
 from sqlalchemy.exc import IntegrityError, OperationalError
 from src import create_app
@@ -9,6 +10,7 @@ from . import db
 
 import cv2
 import numpy as np
+import time
 from matplotlib import pyplot as plt
 
 views = Blueprint("views", __name__)
@@ -28,62 +30,12 @@ def signUp():
 def home():
     return render_template("home.html", user=current_user)
 
+
 app.config["IMAGE_UPLOADS"] = "src/static/image_upload"
 app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["JPG", "JPEG", ]
 folder_images = os.listdir("src/static/image_upload")
 
-
-def allowed_image(filename):
-    if not "." in filename:
-        return False
-    ext = filename.rsplit(".", (1))[1]
-    if ext.upper() in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
-        return True
-    else:
-        return False
-
-
-@views.route("/image_upload", methods=["GET", "POST"])
-def image_upload():
-    if request.method == "POST":
-        title = request.form.get("Title")
-        description = request.form.get("Description")
-
-        if request.files:
-            image = request.files["image"]
-            print("Image Saved!")
-
-            if image.filename == "":
-                print("Image Must Have A Filename")
-                return redirect(request.url)
-
-            if not allowed_image(image.filename):
-                print("That image extension in not allowed!")
-                return redirect(request.url)
-            else:
-                filename = secure_filename(image.filename)
-                if title == "":
-                    title = filename
-                if description == "":
-                    description = ""
-                try:
-                    new_file = Image(data = f'src/static/image_upload/{filename}',title = title, description = description, user_id = current_user.id)
-                    user = User.query.filter_by(id = current_user.id).first()
-                    for images in user.images:
-                        if new_file.data == images.data:
-                            print("This image already exists")
-                            return redirect (request.url)
-                    db.session.add(new_file)
-                except OperationalError or IntegrityError:
-                    db.session.rollback()
-            db.session.commit()
-            image.save(os.path.join(app.config["IMAGE_UPLOADS"], filename))
-            return redirect(url_for("views.specify"))
-    return render_template("image_upload.html", user=current_user)
-
-
-@views.route("/specify")
-def specify():
+def image_specification():
     net = cv2.dnn.readNet('assets/yolov3.weights', 'assets/yolov3.cfg')
     classes = []
     # Passing the names of the txt file in a array
@@ -92,10 +44,11 @@ def specify():
 
     # Storing the image and take the with, the height and the depth
     user = User.query.get(current_user.id)
-    ext = user.images[-1].data.split(".")
+    images = Image.query.filter_by(user_id = User.id).all()
+    ext = user.images[-1].data.split(".")[-1]
     if user.images[-1].title:
         filename = user.images[-1].title
-        fullname = filename+"."+ext[-1]
+        fullname = filename+"."+ext
     else:
         filename = user.images[-1].data.split("/")
     img = plt.imread(user.images[-1].data)
@@ -103,7 +56,7 @@ def specify():
 
     # Make sure all the imported image will have the same size and also scalling down the image
     blob = cv2.dnn.blobFromImage(
-    img, 1/255, (416, 416), (0, 0, 0), swapRB=True, crop=False)
+        img, 1/255, (416, 416), (0, 0, 0), swapRB=True, crop=False)
     net.setInput(blob)
     output_layers = net.getUnconnectedOutLayersNames()
     layerOutputs = net.forward(output_layers)
@@ -114,7 +67,7 @@ def specify():
 
     for output in layerOutputs:
         for detection in output:
-        
+
             # Stores all the classes predictions of the image, finding the location of the highest score and then store it
             scores = detection[5:]
             class_id = np.argmax(scores)
@@ -154,7 +107,7 @@ def specify():
         color = colors[i]
 
         rect = plt.Rectangle((x, y), w, h, linewidth=1,
-                         edgecolor='b', facecolor='none')
+                             edgecolor='b', facecolor='none')
         label_text = plt.text((x + 2), (y + 20), label)
         prediction_text = plt.text((x + 2), (y + 37), prediction + "%")
         plt.xticks([])
@@ -170,16 +123,85 @@ def specify():
             quantity_labels.append(
                 len([temp_label for temp_label in all_labels if value == temp_label]))
 
-        axes.imshow(img)
-        if user.images[-1].title:
-            prediction_image = f"src/static/predicted_images/{fullname}"
-            plt.savefig(prediction_image, bbox_inches="tight")
-            return render_template("specify.html", user=current_user,name = prediction_image[4:], title = filename, description = user.images[-1].description)
-        else:
-            prediction_image = f"src/static/predicted_images/{filename[-1]}"
-            plt.savefig(prediction_image, bbox_inches="tight")
-            return render_template("specify.html", user=current_user, name = prediction_image[4:] )
+    update = Image.query.filter_by(user_id = current_user.id).all()
+    update[len(update) - 1].labels = str(distinct_labels)
+    update[len(update) - 1].quantity = str(quantity_labels)
+
+    db.session.commit()
+    axes.imshow(img)
+    if user.images[-1].title:
+        prediction_image = f"src/static/predicted_images/{fullname}"
+        plt.savefig(prediction_image, bbox="tight")
+    else:
+        prediction_image = f"src/static/predicted_images/{filename[-1]}"
+        plt.savefig(prediction_image, bbox_inches="tight")
+
+def allowed_image(filename):
+    if not "." in filename:
+        return False
+    ext = filename.rsplit(".", (1))[1]
+    if ext.upper() in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
+        return True
+    else:
+        return False
+
+
+@views.route("/image_upload", methods=["GET", "POST"])
+def image_upload():
+    if request.method == "POST":
+        title = request.form.get("Title")
+        description = request.form.get("Description")
+
+        if request.files:
+            image = request.files["image"]
+            print("Image Saved!")
+
+            if image.filename == "":
+                print("Image Must Have A Filename")
+                return redirect(request.url)
+
+            if not allowed_image(image.filename):
+                print("That image extension in not allowed!")
+                return redirect(request.url)
+            else:
+                filename = secure_filename(image.filename)
+                if title == "":
+                    title = filename
+                if description == "":
+                    description = ""
+                try:
+                    new_file = Image(data=f'src/static/image_upload/{filename}', title=title, description=description, user_id=current_user.id)
+                    # for images in user.images:
+                    #     if new_file.data == images.data:
+                    #         flash("This image already exists in your collection!", category="error")
+                    #         return redirect(request.url)
+                    db.session.add(new_file)
+                except OperationalError or IntegrityError:
+                    db.session.rollback()
+            db.session.commit()
+            image.save(os.path.join(app.config["IMAGE_UPLOADS"], filename))
+            image_specification()
+    return render_template("image_upload.html", user=current_user)
+
+
+@views.route("/collection")
+def collection():
+    all_labels = []
+    all_quantity = []
+    user = User.query.get(current_user.id)
+    images = Image.query.filter_by(user_id = user.id).all()  
+    # for img in images:
+    #     fixed_labels = img.labels.replace("[","").replace("]","").replace("'","").replace(",","\n").replace(" ","")
+    #     fixed_quantity = img.quantity.replace("[","").replace("]","").replace("'","").replace(",","\n").replace(" ","")
+    #     all_labels = fixed_labels.splitlines()
+    #     all_quantity = fixed_quantity.splitlines()
+    return render_template("collection.html", user = user, images = images, labels = all_labels, quantity = all_quantity)
 
 @views.route("/specify/<int:id>")
-def specify_images(id):
-    return render_template("specify_images.html")
+def specify(id):
+    images = Image.query.filter_by(user_id = User.id).all()
+    for img in images:
+        if id == img.id:
+            ext = img.data.split('.')[-1]
+            fullname = img.title+"."+ext
+    return render_template("specify.html", name = f"../static/predicted_images/{fullname}")
