@@ -30,15 +30,19 @@
       </button>
       <div class="collapse navbar-collapse" id="navbar">
         <div class="navbar-nav">
-          {% if user.is_authenticated %}
-          <a class="nav-item nav-link" id="home" href="/">Home</a>
-          <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
-          <a class="nav-item nav-link" id="image_upload" href="/image_upload">Test Me!</a>
-          {% else %}
-          <a class="nav-item nav-link" id="login" href="/login">Login</a>
-          <a class="nav-item nav-link" id="signUp" href="/sign-up">Sign Up</a>
+          {% if current_user.is_authenticated%}
+            <a class="nav-item nav-link" id="home" href="/">Home</a>
+            <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
+            <a class="nav-item nav-link" id="image_upload" href="/image_upload">Test Me!</a>
+            {% if current_user.images %}
+              <a class="nav-item nav-link" id ="collection" href="/collection">Image Collection</a>
+            {% endif %}          
+          {% else %}          
+            <a class="nav-item nav-link" id="login" href="/login">Login</a>
+            <a class="nav-item nav-link" id="signUp" href="/sign-up">Sign Up</a>
           {% endif %}
         </div>
+        {% block collection %} {% endblock %}
       </div>
     </nav>
 
