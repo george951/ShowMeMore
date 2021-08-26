@@ -1,12 +1,11 @@
 from os import name
 
-from sqlalchemy.sql.sqltypes import ARRAY
 from . import db 
 from flask_login import UserMixin
 from datetime import datetime
-from sqlalchemy.types import ARRAY 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    relation = db.Column(db.Integer, unique=True)
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
     first_name = db.Column(db.String(150))
@@ -22,6 +21,7 @@ class User(db.Model, UserMixin):
 
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    relational_id = db.Column(db.Integer)
     data = db.Column(db.String(100))
     date = db.Column(db.DateTime(timezone=True), default=datetime.now())
     title = db.Column(db.String(150))
