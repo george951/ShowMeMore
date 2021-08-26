@@ -18,7 +18,7 @@ app = create_app()
 
 filename = ""
 ext = ""
-
+rel_id= 1
 
 @views.route("/sign-up")
 def signUp():
@@ -34,6 +34,7 @@ def home():
 app.config["IMAGE_UPLOADS"] = "src/static/image_upload"
 app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["JPG", "JPEG", ]
 folder_images = os.listdir("src/static/image_upload")
+
 
 def image_specification():
     net = cv2.dnn.readNet('assets/yolov3.weights', 'assets/yolov3.cfg')
@@ -123,10 +124,11 @@ def image_specification():
             quantity_labels.append(
                 len([temp_label for temp_label in all_labels if value == temp_label]))
 
-    update = Image.query.filter_by(user_id = current_user.id).all()
-    update[len(update) - 1].labels = str(distinct_labels)
-    update[len(update) - 1].quantity = str(quantity_labels)
-
+    distinct_labels = np.array(distinct_labels)
+    user = User.query.get(current_user.id)
+    for upd in range(len(distinct_labels)):
+        db.session.add(Image(relational_id = len(user.images), labels = distinct_labels[upd], quantity = quantity_labels[upd]))
+    
     db.session.commit()
     axes.imshow(img)
     if user.images[-1].title:
@@ -144,7 +146,6 @@ def allowed_image(filename):
         return True
     else:
         return False
-
 
 @views.route("/image_upload", methods=["GET", "POST"])
 def image_upload():
@@ -170,7 +171,7 @@ def image_upload():
                 if description == "":
                     description = ""
                 try:
-                    new_file = Image(data=f'src/static/image_upload/{filename}', title=title, description=description, user_id=current_user.id)
+                    new_file = Image(data=f'src/static/image_upload/{filename}', title=title, description=description, user_id=current_user.id, relational_id = Image.query.with_entities(Image.id).count() + 1 )
                     # for images in user.images:
                     #     if new_file.data == images.data:
                     #         flash("This image already exists in your collection!", category="error")
@@ -179,10 +180,14 @@ def image_upload():
                 except OperationalError or IntegrityError:
                     db.session.rollback()
             db.session.commit()
+
+            user = User.query.get(current_user.id)
+            images = Image.query.filter_by(user_id = current_user.id).all() 
+
+            images[-1].relational_id = len(user.images)
             image.save(os.path.join(app.config["IMAGE_UPLOADS"], filename))
             image_specification()
     return render_template("image_upload.html", user=current_user)
-
 
 @views.route("/collection")
 def collection():
@@ -190,12 +195,44 @@ def collection():
     all_quantity = []
     user = User.query.get(current_user.id)
     images = Image.query.filter_by(user_id = user.id).all()  
-    # for img in images:
-    #     fixed_labels = img.labels.replace("[","").replace("]","").replace("'","").replace(",","\n").replace(" ","")
-    #     fixed_quantity = img.quantity.replace("[","").replace("]","").replace("'","").replace(",","\n").replace(" ","")
-    #     all_labels = fixed_labels.splitlines()
-    #     all_quantity = fixed_quantity.splitlines()
+
     return render_template("collection.html", user = user, images = images, labels = all_labels, quantity = all_quantity)
+
+@views.route("<string:labels>")
+def filter_collection(labels):
+
+    
+    rel_data = Image.query.with_entities(Image.relational_id).all()
+    rel_count = Image.query.with_entities(Image.relational_id).count()
+
+    true_labels = Image.query.with_entities(Image.labels).all()
+
+    users_id_count = Image.query.filter_by(user_id = current_user.id).count()
+    users_id_data = Image.query.with_entities(Image.user_id).all()
+
+    sorted_images = []
+    
+    for x in range(users_id_count + 1):
+        if x > 0:
+            y = 0
+            while y < rel_count:
+                if users_id_data[y][0] == current_user.id:
+                    w = y
+                    while x == rel_data[w][0]:
+                        if true_labels[w][0] == labels:
+                            image = Image.query.filter_by(relational_id = rel_data[w][0]).first()
+                            sorted_images.append(image)
+                            break
+                        else: 
+                            w += 1
+                y += 1
+
+    return render_template("filtered_collection.html", images = sorted_images)
+                        
+                                    
+
+   
+    
 
 @views.route("/specify/<int:id>")
 def specify(id):
