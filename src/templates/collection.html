@@ -1,22 +1,6 @@
 {% extends "base.html" %} {% block title %} ShowMeMore {% endblock %} {% block
 content %}
 
-<!-- <div class="container">
-  <div class="row row-cols-5" style="margin-left: -25%; margin-right:-23%">
-    {% for img in images %}
-      <div class="col" style="margin-top:1%">
-        <div class="card" style="width:320px; height:380px;" >
-          <img src="{{ img.data[4:] }}" class="card-img-top" alt="predicted image" style="width:319px; height:212px"/>
-          <div class="card-body">
-            <h5 class="card-title">{{ img.title }}</h5>
-            <p class="card-text">{{ img.description }}</p>
-            <a href="{{ url_for ('views.specify', id = img.id) }}" class="btn btn-primary">Go somewhere</a>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-  </div>
-</div> -->
 <div class=table-responsive>
   <table class="table">
     <thead>
@@ -31,7 +15,7 @@ content %}
     <tbody>
         {% for img in images%}
           <tr>
-            <th scope="row">{{img.id}}</th>
+            <th scope="row">{{img.relational_id}}</th>
             <td>
               <img src="{{ img.data[4:] }}" alt="predicted image" style="width:280px; height:180px">
             </td>
@@ -60,86 +44,86 @@ content %}
     Search For...
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <a class="dropdown-item" href="collection/person">Person</a>
-    <a class="dropdown-item" href="collection/bicycle">Bicycle</a>
-    <a class="dropdown-item" href="collection/car">Car</a>
-    <a class="dropdown-item" href="collection/motorbike">Motorbike</a>
-    <a class="dropdown-item" href="collection/aeroplane">Aeroplane</a>
-    <a class="dropdown-item" href="collection/bus">Bus</a>
-    <a class="dropdown-item" href="collection/train">Train</a>
-    <a class="dropdown-item" href="collection/truck">Truck</a>
-    <a class="dropdown-item" href="collection/boat">Boat</a>
-    <a class="dropdown-item" href="collection/traffic-light">Traffic Light</a>
-    <a class="dropdown-item" href="collection/fire-hydrant">Fire Hydrant</a>
-    <a class="dropdown-item" href="collection/stop-sign">Stop Sign</a>
-    <a class="dropdown-item" href="collection/parking-meter">Parking Meter</a>
-    <a class="dropdown-item" href="collection/bench">Bench</a>
-    <a class="dropdown-item" href="collection/bird">Bird</a>
-    <a class="dropdown-item" href="collection/cat">Cat</a>
-    <a class="dropdown-item" href="collection/dog">Dog</a>
-    <a class="dropdown-item" href="collection/horse">Horse</a>
-    <a class="dropdown-item" href="collection/sheep">Sheep</a>
-    <a class="dropdown-item" href="collection/cow">Cow</a>
-    <a class="dropdown-item" href="collection/elephant">Elephant</a>
-    <a class="dropdown-item" href="collection/bear">Bear</a>
-    <a class="dropdown-item" href="collection/zebra">Zebra</a>
-    <a class="dropdown-item" href="collection/giraffe">Giraffe</a>
-    <a class="dropdown-item" href="collection/backpack">Backpack</a>
-    <a class="dropdown-item" href="collection/umbrella">Umbrella</a>
-    <a class="dropdown-item" href="collection/handbag">Handbag</a>
-    <a class="dropdown-item" href="collection/tie">Tie</a>
-    <a class="dropdown-item" href="collection/suitcase">Suitcase</a>
-    <a class="dropdown-item" href="collection/frisbee">Frisbee</a>
-    <a class="dropdown-item" href="collection/skis">Skis</a>
-    <a class="dropdown-item" href="collection/snowboard">Snowboard</a>
-    <a class="dropdown-item" href="collection/sports-ball">Sports Ball</a>
-    <a class="dropdown-item" href="collection/kite">Kite</a>
-    <a class="dropdown-item" href="collection/baseball-bat">Baseball Bat</a>
-    <a class="dropdown-item" href="collection/baseball-glove">Baseball Glove</a>
-    <a class="dropdown-item" href="collection/skateboard">Skateboard</a>
-    <a class="dropdown-item" href="collection/surfboard">Surfboard</a>
-    <a class="dropdown-item" href="collection/tennis-racket">Tennis Racket</a>
-    <a class="dropdown-item" href="collection/bottle">Bottle</a>
-    <a class="dropdown-item" href="collection/wine-glass">Wine Glass</a>
-    <a class="dropdown-item" href="collection/cup">Cup</a>
-    <a class="dropdown-item" href="collection/fork">Fork</a>
-    <a class="dropdown-item" href="collection/knife">Knife</a>
-    <a class="dropdown-item" href="collection/spoon">Spoon</a>
-    <a class="dropdown-item" href="collection/bowl">Bowl</a>
-    <a class="dropdown-item" href="collection/banana">Banana</a>
-    <a class="dropdown-item" href="collection/apple">Apple</a>
-    <a class="dropdown-item" href="collection/sandwich">Sandwich</a>
-    <a class="dropdown-item" href="collection/orange">Orange</a>
-    <a class="dropdown-item" href="collection/broccoli">Broccoli</a>
-    <a class="dropdown-item" href="collection/carrot">Carrot</a>
-    <a class="dropdown-item" href="collection/hot-dog">Hot Dog</a>
-    <a class="dropdown-item" href="collection/pizza">Pizza</a>
-    <a class="dropdown-item" href="collection/donut">Donut</a>
-    <a class="dropdown-item" href="collection/cake">Cake</a>
-    <a class="dropdown-item" href="collection/chair">Chair</a>
-    <a class="dropdown-item" href="collection/sofa">Sofa</a>
-    <a class="dropdown-item" href="collection/potted-plant">Potted Plant</a>
-    <a class="dropdown-item" href="collection/bed">Bed</a>
-    <a class="dropdown-item" href="collection/dining-table">Dinning Table</a>
-    <a class="dropdown-item" href="collection/toilet">toilet</a>
-    <a class="dropdown-item" href="collection/tv-monitor">Tv Monitor</a>
-    <a class="dropdown-item" href="collection/laptop">Laptop</a>
-    <a class="dropdown-item" href="collection/mouse">Mouse</a>
-    <a class="dropdown-item" href="collection/remote">Remote</a>
-    <a class="dropdown-item" href="collection/keyboard">Keyboard</a>
-    <a class="dropdown-item" href="collection/cell-phone">Cell Phone</a>
-    <a class="dropdown-item" href="collection/microwave">Microwave</a>
-    <a class="dropdown-item" href="collection/oven">Oven</a>
-    <a class="dropdown-item" href="collection/toaster">Toaster</a>
-    <a class="dropdown-item" href="collection/sink">Sink</a>
-    <a class="dropdown-item" href="collection/refrigerator">Refrigerator</a>
-    <a class="dropdown-item" href="collection/book">Book</a>
-    <a class="dropdown-item" href="collection/clock">Clock</a>
-    <a class="dropdown-item" href="collection/vase">Vase</a>
-    <a class="dropdown-item" href="collection/scissors">Scissors</a>
-    <a class="dropdown-item" href="collection/teddy-bear">Teddy Bear</a>
-    <a class="dropdown-item" href="collection/hair-dryer">Hair Dryer</a>
-    <a class="dropdown-item" href="collection/toothbrush">Toothbrush</a>
+    <a class="dropdown-item" href="/person">Person</a>
+    <a class="dropdown-item" href="/bicycle">Bicycle</a>
+    <a class="dropdown-item" href="/car">Car</a>
+    <a class="dropdown-item" href="/motorbike">Motorbike</a>
+    <a class="dropdown-item" href="/aeroplane">Aeroplane</a>
+    <a class="dropdown-item" href="/bus">Bus</a>
+    <a class="dropdown-item" href="/train">Train</a>
+    <a class="dropdown-item" href="/truck">Truck</a>
+    <a class="dropdown-item" href="/boat">Boat</a>
+    <a class="dropdown-item" href="/traffic-light">Traffic Light</a>
+    <a class="dropdown-item" href="/fire-hydrant">Fire Hydrant</a>
+    <a class="dropdown-item" href="/stop-sign">Stop Sign</a>
+    <a class="dropdown-item" href="/parking-meter">Parking Meter</a>
+    <a class="dropdown-item" href="/bench">Bench</a>
+    <a class="dropdown-item" href="/bird">Bird</a>
+    <a class="dropdown-item" href="/cat">Cat</a>
+    <a class="dropdown-item" href="/dog">Dog</a>
+    <a class="dropdown-item" href="/horse">Horse</a>
+    <a class="dropdown-item" href="/sheep">Sheep</a>
+    <a class="dropdown-item" href="/cow">Cow</a>
+    <a class="dropdown-item" href="/elephant">Elephant</a>
+    <a class="dropdown-item" href="/bear">Bear</a>
+    <a class="dropdown-item" href="/zebra">Zebra</a>
+    <a class="dropdown-item" href="/giraffe">Giraffe</a>
+    <a class="dropdown-item" href="/backpack">Backpack</a>
+    <a class="dropdown-item" href="/umbrella">Umbrella</a>
+    <a class="dropdown-item" href="/handbag">Handbag</a>
+    <a class="dropdown-item" href="/tie">Tie</a>
+    <a class="dropdown-item" href="/suitcase">Suitcase</a>
+    <a class="dropdown-item" href="/frisbee">Frisbee</a>
+    <a class="dropdown-item" href="/skis">Skis</a>
+    <a class="dropdown-item" href="/snowboard">Snowboard</a>
+    <a class="dropdown-item" href="/sports-ball">Sports Ball</a>
+    <a class="dropdown-item" href="/kite">Kite</a>
+    <a class="dropdown-item" href="/baseball-bat">Baseball Bat</a>
+    <a class="dropdown-item" href="/baseball-glove">Baseball Glove</a>
+    <a class="dropdown-item" href="/skateboard">Skateboard</a>
+    <a class="dropdown-item" href="/surfboard">Surfboard</a>
+    <a class="dropdown-item" href="/tennis-racket">Tennis Racket</a>
+    <a class="dropdown-item" href="/bottle">Bottle</a>
+    <a class="dropdown-item" href="/wine-glass">Wine Glass</a>
+    <a class="dropdown-item" href="/cup">Cup</a>
+    <a class="dropdown-item" href="/fork">Fork</a>
+    <a class="dropdown-item" href="/knife">Knife</a>
+    <a class="dropdown-item" href="/spoon">Spoon</a>
+    <a class="dropdown-item" href="/bowl">Bowl</a>
+    <a class="dropdown-item" href="/banana">Banana</a>
+    <a class="dropdown-item" href="/apple">Apple</a>
+    <a class="dropdown-item" href="/sandwich">Sandwich</a>
+    <a class="dropdown-item" href="/orange">Orange</a>
+    <a class="dropdown-item" href="/broccoli">Broccoli</a>
+    <a class="dropdown-item" href="/carrot">Carrot</a>
+    <a class="dropdown-item" href="/hot-dog">Hot Dog</a>
+    <a class="dropdown-item" href="/pizza">Pizza</a>
+    <a class="dropdown-item" href="/donut">Donut</a>
+    <a class="dropdown-item" href="/cake">Cake</a>
+    <a class="dropdown-item" href="/chair">Chair</a>
+    <a class="dropdown-item" href="/sofa">Sofa</a>
+    <a class="dropdown-item" href="/potted-plant">Potted Plant</a>
+    <a class="dropdown-item" href="/bed">Bed</a>
+    <a class="dropdown-item" href="/dining-table">Dinning Table</a>
+    <a class="dropdown-item" href="/toilet">toilet</a>
+    <a class="dropdown-item" href="/tv-monitor">Tv Monitor</a>
+    <a class="dropdown-item" href="/laptop">Laptop</a>
+    <a class="dropdown-item" href="/mouse">Mouse</a>
+    <a class="dropdown-item" href="/remote">Remote</a>
+    <a class="dropdown-item" href="/keyboard">Keyboard</a>
+    <a class="dropdown-item" href="/cell-phone">Cell Phone</a>
+    <a class="dropdown-item" href="/microwave">Microwave</a>
+    <a class="dropdown-item" href="/oven">Oven</a>
+    <a class="dropdown-item" href="/toaster">Toaster</a>
+    <a class="dropdown-item" href="/sink">Sink</a>
+    <a class="dropdown-item" href="/refrigerator">Refrigerator</a>
+    <a class="dropdown-item" href="/book">Book</a>
+    <a class="dropdown-item" href="/clock">Clock</a>
+    <a class="dropdown-item" href="/vase">Vase</a>
+    <a class="dropdown-item" href="/scissors">Scissors</a>
+    <a class="dropdown-item" href="/teddy-bear">Teddy Bear</a>
+    <a class="dropdown-item" href="/hair-dryer">Hair Dryer</a>
+    <a class="dropdown-item" href="/toothbrush">Toothbrush</a>
   </div>
 </div>
 {% endblock %}
