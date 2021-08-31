@@ -18,7 +18,6 @@ app = create_app()
 
 filename = ""
 ext = ""
-rel_id= 1
 
 @views.route("/sign-up")
 def signUp():
@@ -32,7 +31,7 @@ def home():
 
 
 app.config["IMAGE_UPLOADS"] = "src/static/image_upload"
-app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["JPG", "JPEG", ]
+app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["JPG", "JPEG"]
 folder_images = os.listdir("src/static/image_upload")
 
 
@@ -44,14 +43,25 @@ def image_specification():
         classes = f.read().splitlines()
 
     # Storing the image and take the with, the height and the depth
+    # user = User.query.get(current_user.id)
+    # images = Image.query.filter_by(user_id = User.id).all()
+    # ext = user.images[-1].data.split(".")[-1]
+    # if user.images[-1].title:
+    #     filename = user.images[-1].title
+    #     fullname = filename+"."+ext
+    # else:
+    #     filename = user.images[-1].data.split("/")
+
     user = User.query.get(current_user.id)
     images = Image.query.filter_by(user_id = User.id).all()
-    ext = user.images[-1].data.split(".")[-1]
-    if user.images[-1].title:
-        filename = user.images[-1].title
-        fullname = filename+"."+ext
-    else:
-        filename = user.images[-1].data.split("/")
+    for im in user.images:
+        if im.data:
+            ext = im.data.split(".")[-1]
+            if im.title:
+                filename = im.title
+                fullname = filename
+            else:
+                filename = im.data.split("/")
     img = plt.imread(user.images[-1].data)
     height, width, deapth = img.shape
 
@@ -124,19 +134,25 @@ def image_specification():
             quantity_labels.append(
                 len([temp_label for temp_label in all_labels if value == temp_label]))
 
+    rel_id = []
     distinct_labels = np.array(distinct_labels)
     user = User.query.get(current_user.id)
+    images = Image.query.filter_by(user_id = current_user.id).all()
+    for im in images:
+        if im.data:
+            rel_id.append(im.data)
+
     for upd in range(len(distinct_labels)):
-        db.session.add(Image(relational_id = len(user.images), labels = distinct_labels[upd], quantity = quantity_labels[upd]))
+        db.session.add(Image(relational_id = len(rel_id), labels = distinct_labels[upd], quantity = quantity_labels[upd], user_id = current_user.id))
     
     db.session.commit()
     axes.imshow(img)
     if user.images[-1].title:
         prediction_image = f"src/static/predicted_images/{fullname}"
-        plt.savefig(prediction_image, bbox="tight")
+        plt.savefig(prediction_image, bbox_inches = "tight")
     else:
-        prediction_image = f"src/static/predicted_images/{filename[-1]}"
-        plt.savefig(prediction_image, bbox_inches="tight")
+        prediction_image = f"src/static/predicted_images/{filename}"
+        plt.savefig(prediction_image, bbox_inches = "tight")
 
 def allowed_image(filename):
     if not "." in filename:
@@ -149,6 +165,7 @@ def allowed_image(filename):
 
 @views.route("/image_upload", methods=["GET", "POST"])
 def image_upload():
+    user = User.query.get(current_user.id)
     if request.method == "POST":
         title = request.form.get("Title")
         description = request.form.get("Description")
@@ -156,7 +173,6 @@ def image_upload():
         if request.files:
             image = request.files["image"]
             print("Image Saved!")
-
             if image.filename == "":
                 print("Image Must Have A Filename")
                 return redirect(request.url)
@@ -171,11 +187,11 @@ def image_upload():
                 if description == "":
                     description = ""
                 try:
-                    new_file = Image(data=f'src/static/image_upload/{filename}', title=title, description=description, user_id=current_user.id, relational_id = Image.query.with_entities(Image.id).count() + 1 )
-                    # for images in user.images:
-                    #     if new_file.data == images.data:
-                    #         flash("This image already exists in your collection!", category="error")
-                    #         return redirect(request.url)
+                    new_file = Image(data=f'src/static/image_upload/{filename}', title=title, description=description, user_id=current_user.id)
+                    for images in user.images:
+                        if new_file.data == images.data:
+                            flash("This image already exists in your collection!", category="error")
+                            return redirect(request.url)
                     db.session.add(new_file)
                 except OperationalError or IntegrityError:
                     db.session.rollback()
@@ -183,8 +199,11 @@ def image_upload():
 
             user = User.query.get(current_user.id)
             images = Image.query.filter_by(user_id = current_user.id).all() 
-
-            images[-1].relational_id = len(user.images)
+            if len(user.images) == 1:
+                images[-1].relational_id = len(user.images)
+            else:
+                images[-1].relational_id = images[-2].relational_id + 1
+           
             image.save(os.path.join(app.config["IMAGE_UPLOADS"], filename))
             image_specification()
     return render_template("image_upload.html", user=current_user)
@@ -193,52 +212,59 @@ def image_upload():
 def collection():
     all_labels = []
     all_quantity = []
+
     user = User.query.get(current_user.id)
-    images = Image.query.filter_by(user_id = user.id).all()  
+    images = Image.query.filter_by(user_id = user.id).all()
 
-    return render_template("collection.html", user = user, images = images, labels = all_labels, quantity = all_quantity)
+    return render_template("collection.html", user = user, images = images, labels = all_labels, quantity = all_quantity, images_id = images)
 
-@views.route("<string:labels>")
+@views.route("/<labels>")
 def filter_collection(labels):
 
-    
-    rel_data = Image.query.with_entities(Image.relational_id).all()
-    rel_count = Image.query.with_entities(Image.relational_id).count()
-
-    true_labels = Image.query.with_entities(Image.labels).all()
-
-    users_id_count = Image.query.filter_by(user_id = current_user.id).count()
-    users_id_data = Image.query.with_entities(Image.user_id).all()
-
     sorted_images = []
+    get_rel_id = []
     
-    for x in range(users_id_count + 1):
-        if x > 0:
-            y = 0
-            while y < rel_count:
-                if users_id_data[y][0] == current_user.id:
-                    w = y
-                    while x == rel_data[w][0]:
-                        if true_labels[w][0] == labels:
-                            image = Image.query.filter_by(relational_id = rel_data[w][0]).first()
-                            sorted_images.append(image)
-                            break
-                        else: 
-                            w += 1
-                y += 1
+    images_for_user = Image.query.filter_by(user_id = current_user.id).all()
+    
+    for img in images_for_user:
+        if img.labels == labels:
+            get_rel_id.append(img.relational_id)
+
+    if get_rel_id == []:
+        flash(f"There is no image with the {labels} label", category="error")
+        return redirect("http://127.0.0.1:5000/collection")
+
+    rel_index = 0
+    for img in images_for_user:
+        if img.data:
+            if img.relational_id == get_rel_id[rel_index]:
+                image  = Image.query.filter_by(relational_id = get_rel_id[rel_index]).first()
+                sorted_images.append(image)
+                rel_index += 1
+                if len(get_rel_id) == 1:
+                    rel_index = 0
 
     return render_template("filtered_collection.html", images = sorted_images)
+
                         
                                     
-
-   
-    
-
 @views.route("/specify/<int:id>")
 def specify(id):
-    images = Image.query.filter_by(user_id = User.id).all()
-    for img in images:
-        if id == img.id:
-            ext = img.data.split('.')[-1]
-            fullname = img.title+"."+ext
-    return render_template("specify.html", name = f"../static/predicted_images/{fullname}")
+
+    get_rel_id = Image.query.get(id).relational_id
+    all_images = Image.query.filter_by(user_id = current_user.id).all()
+    user_id = Image.query.get(id).user_id
+
+    image = []
+    labels = []
+    quantities = []
+    
+    for img in all_images:
+        if get_rel_id == img.relational_id:
+            if img.data:
+               image.append(img.data)
+            else:
+                labels.append(img.labels)
+                quantities.append(img.quantity)
+
+    return render_template("specify.html", name = f"../static/predicted_images/{image[0][24:]}", labels = labels, quantities = quantities)
