@@ -14,17 +14,19 @@ content %}
     </thead>
     <tbody>
         {% for img in images%}
-          <tr>
-            <th scope="row">{{img.relational_id}}</th>
-            <td>
-              <img src="{{ img.data[4:] }}" alt="predicted image" style="width:280px; height:180px">
-            </td>
-            <td>{{img.title}}</td>
-            <td>{{img.description}}</td>
-            <td>
-              <a href="{{url_for ('views.specify', id = img.id) }}" class="btn btn-primary" style="width:110px">Do it!</a>
-            </td>
+          {% if img.data %}
+            <tr>
+              <th scope="row">{{img.relational_id}}</th>
+              <td>
+                <img src="{{ img.data[4:] }}" alt="predicted image" style="width:280px; height:180px">
+              </td>
+              <td>{{img.title}}</td>
+              <td>{{img.description}}</td>
+              <td>
+                <a href="{{url_for ('views.specify', id = img.id ) }}" class="btn btn-primary" style="width:110px">Do it!</a>
+              </td>
             </tr>
+          {% endif %}
         {% endfor %}
     </tbody>
   </table>
