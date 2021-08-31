@@ -11,6 +11,7 @@ def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = "thisisasecretkey"
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.init_app(app)
 
     from .views import views
@@ -21,20 +22,19 @@ def create_app():
 
     from .models import User, Image
 
-    create_db(app)
-
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
     login_manager.init_app(app)
+
+    @app.before_first_request
+    def create_tables():
+        from .models import Image, User
+        db.create_all(app=app)
+        print("Created database")
+    
 
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(int(id))
 
     return app
-
-
-def create_db(app):
-    if not path.exists('src/' + DB_NAME):
-        db.create_all(app=app)
-        print("Created Database!")

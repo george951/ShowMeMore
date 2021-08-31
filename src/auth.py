@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_login import login_user, login_required, logout_user, current_user
 from src import create_app
+from sqlalchemy.exc import OperationalError
 
 
 auth = Blueprint("auth", __name__)
@@ -65,12 +66,15 @@ def signUp():
         elif password != passwordConf:
             flash("Password is not the same", category="error")
         else:
-            new_user = User(first_name=firstName, last_name=lastName, email=email,
+            try:
+                new_user = User(first_name=firstName, last_name=lastName, email=email,
                             password=generate_password_hash(password, method="sha256"))
-            db.session.add(new_user)
-            db.session.commit()
-            login_user(new_user, remember=True)
-            flash("Welcome in!", category="success")
+                db.session.add(new_user)
+                db.session.commit()
+                login_user(new_user, remember=True)
+                flash("Welcome in!", category="success")
+            except OperationalError:
+                db.session.rollback()
             return redirect(url_for('views.home'))
 
     return render_template("signUp.html",user=current_user)
