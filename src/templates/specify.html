@@ -5,5 +5,29 @@
  {% endblock %} 
 
 {% block content %}
-    <img src="{{ name }}">
+    <link rel="stylesheet" href="/static/css/specify.css">
+    <div class ="image-wrapper">
+        <div class="image-with-border">
+            <img id="main-image" src="{{ name }}">
+            <img class="border-img" id="border" src="../static/pre-uploaded_images/border.png"> 
+        </div>
+        <h5 id="title" >Predicted image</h5>
+    </div>
+
+    {% set inc = namespace(value=0) %}
+    <div class="quantities">
+        <div class="center">
+            <h1>Quantities</h1>
+                {% for quant in quantities %}
+                    <div class="skillbox">
+                        <p>{{labels[inc.value]}}</p>
+                        <p>{{quant}}</p>
+                        <div class="skill">
+                            <div class="skill_level"></div>
+                        </div>
+                    </div>
+                    {% set inc.value = inc.value + 1 %}
+                {% endfor %}
+        </div>
+    </div>
 {% endblock %}
