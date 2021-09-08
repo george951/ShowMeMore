@@ -15,11 +15,30 @@
       href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
       crossorigin="anonymous"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>{% block title %} Home {% endblock %}</title>
   </head>
 
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <link rel="stylesheet" href="/static/css/base.css" />
+    <div class="footer" style="background-color: #343a40">
+      <a href="https://di.ionio.gr/">
+        <img src="../static/pre-uploaded_images/logo-ionio.png"/>
+      </a>
+      <h5>Ι Ο Ν Ι Ο</h5>
+      <h5 class="college">Π Α Ν Ε Π Ι Σ Τ Η Μ Ι Ο</h5>
+      <p>Τ Μ Η Μ Α</p>
+      <p class="dept">Π Λ Η Ρ Ο Φ Ο Ρ Ι Κ Η Σ</p>
+      <p class="author">&#169 George iliopoulos</p>
+      <a href="https://github.com/george951">
+        <i class="fa fa-github" style="font-size:48px;padding-left:85%;color:grey"></i>
+      </a>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="height:80px">
+      <a href="/#">
+        <img src="../static/pre-uploaded_images/logo.png" style="width:150px;height:150px;margin-right:20px;">
+      </a>
       <button
         class="navbar-toggler"
         type="button"
@@ -31,42 +50,41 @@
       <div class="collapse navbar-collapse" id="navbar">
         <div class="navbar-nav">
           {% if current_user.is_authenticated%}
-            <a class="nav-item nav-link" id="home" href="/">Home</a>
-            <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
-            <a class="nav-item nav-link" id="image_upload" href="/image_upload">Test Me!</a>
-            {% if current_user.images %}
-              <a class="nav-item nav-link" id ="collection" href="/collection">Image Collection</a>
-            {% endif %}          
-          {% else %}          
-            <a class="nav-item nav-link" id="login" href="/login">Login</a>
-            <a class="nav-item nav-link" id="signUp" href="/sign-up">Sign Up</a>
+          <a class="nav-item nav-link" id="home" href="/">Home</a>
+          <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
+          <a class="nav-item nav-link" id="image_upload" href="/image_upload"
+            >Test Me!</a
+          >
+          {% if current_user.images %}
+          <a class="nav-item nav-link" id="collection" href="/collection"
+            >Image Collection</a
+          >
+          {% endif %} {% else %}
+          <a class="nav-item nav-link" id="login" href="/login">Login</a>
+          <a class="nav-item nav-link" id="signUp" href="/sign-up">Sign Up</a>
           {% endif %}
         </div>
         {% block collection %} {% endblock %}
       </div>
     </nav>
 
-    {% with messages = get_flashed_messages(with_categories=true) %} 
-      {% if messages%} 
-        {% for category,message in messages %} 
-          {% if category == "error" %}
-            <div class="alert alert-danger alert-dismissable fade show" role="alert">
-              {{ message }}
-              <button type="button" class="close" data-dismiss="alert">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-          {% else %}
-            <div class="alert alert-success alert-dismissable fade show" role="alert">
-              {{ message }}
-              <button type="button" class="close" data-dismiss="alert">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages%} {% for category,message in messages %} {% if category == "error"
+    %}
+    <div class="alert alert-danger alert-dismissable fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% else %}
+    <div class="alert alert-success alert-dismissable fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endif %} {% endfor %} {% endif %} {% endwith %}
 
     <div class="container">{% block content %} {% endblock %}</div>
     <script
@@ -88,11 +106,13 @@
     <script>
       type = "text/javascript";
       src = "{{ url_for('static', filename='index.js') }}";
-        $(".custom-file-input").on("change", function() {
-          var fileName = $(this).val().split("\\").pop();
-          $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-        });
+      $(".custom-file-input").on("change", function () {
+        var fileName = $(this).val().split("\\").pop();
+        $(this)
+          .siblings(".custom-file-label")
+          .addClass("selected")
+          .html(fileName);
+      });
     </script>
-    
   </body>
 </html>
