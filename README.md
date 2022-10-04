@@ -2,7 +2,7 @@
 
 ## Description
 
-A simple image recognition written in python, which works with a pre-trained model called yolov3 a real time object detector and a 
+A simple image recognition written in python, which works with a pre-trained model called yolov3 a real time object detector and a pre-sets of weights
 
 ## How it works
 
